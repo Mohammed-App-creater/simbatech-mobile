@@ -39,6 +39,13 @@
     "experiments": {
       "typedRoutes": false,
       "reactCompiler": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "eec85112-67eb-4d2f-847a-a1e996862070"
+      }
+    },
+    "owner": "mohammed-app-creater"
   }
 }
