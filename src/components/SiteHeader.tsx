@@ -25,6 +25,7 @@ export function SiteHeader({ activeDept, searchQuery = "", searchMode = "buy" }:
   const [query, setQuery] = useState(searchQuery);
   const wishHref = hv.signedIn ? "/account?tab=wishlist" : "/signin?next=" + encodeURIComponent("/account?tab=wishlist");
   const submit = () => navigate(searchHref(query, mode));
+  const placeholder = mode === "rent" ? 'What do you need to rent? Try "party tent" or "camera"' : "Search phones, sofas, sneakers and more";
 
   return (
     <View>
@@ -92,18 +93,25 @@ export function SiteHeader({ activeDept, searchQuery = "", searchMode = "buy" }:
               );
             })}
           </View>
-          <TextInput
-            value={query}
-            onChangeText={setQuery}
-            onSubmitEditing={submit}
-            returnKeyType="search"
-            autoCorrect={false}
-            autoCapitalize="none"
-            accessibilityLabel="Search Simbatech"
-            placeholder={mode === "rent" ? 'What do you need to rent? Try "party tent" or "camera"' : "Search phones, sofas, sneakers and more"}
-            placeholderTextColor="#757575"
-            style={[{ flex: 1, minWidth: 0, height: 40, paddingHorizontal: 4, paddingVertical: 0, fontFamily: F.g400, fontSize: 14, color: C.ink }, { outlineWidth: 0 } as object]}
-          />
+          {/* The placeholder is drawn as one ellipsized line: Android wraps a TextInput's own placeholder. */}
+          <View style={{ flex: 1, minWidth: 0, height: 40, justifyContent: "center" }}>
+            {query ? null : (
+              <T s={14} c="#757575" numberOfLines={1} style={{ position: "absolute", left: 4, right: 4 }} pointerEvents="none" importantForAccessibility="no">
+                {placeholder}
+              </T>
+            )}
+            <TextInput
+              value={query}
+              onChangeText={setQuery}
+              onSubmitEditing={submit}
+              returnKeyType="search"
+              autoCorrect={false}
+              autoCapitalize="none"
+              accessibilityLabel="Search Simbatech"
+              accessibilityHint={placeholder}
+              style={[{ height: 40, paddingHorizontal: 4, paddingVertical: 0, fontFamily: F.g400, fontSize: 14, color: C.ink }, { outlineWidth: 0 } as object]}
+            />
+          </View>
           <Tap onPress={submit} label="Search" hitSlop={4} style={{ width: 38, height: 36, borderRadius: 11, backgroundColor: C.green, alignItems: "center", justifyContent: "center" }}>
             <Icon xml={ICON.search} size={17} color={C.white} sw={2.2} />
           </Tap>

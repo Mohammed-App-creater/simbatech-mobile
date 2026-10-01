@@ -60,7 +60,7 @@ export function TabBar() {
         paddingHorizontal: 8,
         paddingTop: 6,
         paddingBottom: 6 + insets.bottom,
-        backgroundColor: "rgba(255,255,255,0.96)",
+        backgroundColor: C.white,
         borderTopWidth: 1,
         borderTopColor: C.line,
         boxShadow: "0 -8px 24px -16px rgba(10,20,35,0.35)",
