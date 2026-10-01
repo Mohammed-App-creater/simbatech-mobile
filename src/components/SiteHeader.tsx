@@ -1,15 +1,16 @@
 /*
- * The site chrome at the top of every page, in its phone layout: the "Deliver to" strip, the
+ * The site chrome at the top of every page, in its phone layout: the "Deliver to" strip (see DeliverTo), the
  * header (logo, All categories, account, wishlist, cart), the search box with the Buy / Rent
  * toggle, and the department row.
  */
 import React, { useState } from "react";
 import { ScrollView, TextInput, View } from "react-native";
 import { C, F, GUTTER } from "@/theme";
-import { headerVals, navigate, searchHref, storeVals, useShop } from "@/lib/store";
+import { headerVals, navigate, searchHref, useShop } from "@/lib/store";
 import { openCategoryMenu } from "@/lib/ui-state";
 import { Icon, ICON, T, Tap } from "./ui";
 import { Logo } from "./ProductArt";
+import { DeliverTo } from "./DeliverTo";
 
 export const deptHref = (name: string) => "/shop?dept=" + encodeURIComponent(name);
 
@@ -20,7 +21,6 @@ export type SiteHeaderProps = { activeDept?: string; searchQuery?: string; searc
 export function SiteHeader({ activeDept, searchQuery = "", searchMode = "buy" }: SiteHeaderProps) {
   const shop = useShop();
   const hv = headerVals(shop);
-  const store = storeVals(shop);
   const [mode, setMode] = useState<"buy" | "rent">(searchMode);
   const [query, setQuery] = useState(searchQuery);
   const wishHref = hv.signedIn ? "/account?tab=wishlist" : "/signin?next=" + encodeURIComponent("/account?tab=wishlist");
@@ -30,16 +30,7 @@ export function SiteHeader({ activeDept, searchQuery = "", searchMode = "buy" }:
     <View>
       {/* utility bar */}
       <View style={{ height: 34, paddingHorizontal: GUTTER, backgroundColor: C.navy, flexDirection: "row", alignItems: "center" }}>
-        <View style={{ height: 24, paddingHorizontal: 10, flexDirection: "row", alignItems: "center", gap: 6, borderWidth: 1, borderColor: "rgba(255,255,255,0.25)", borderRadius: 8 }}>
-          <Icon xml={ICON.pin} size={14} color={C.mint} sw={2} />
-          <T s={12} c={C.white}>
-            Deliver to{" "}
-            <T s={12} w={700} c={C.white}>
-              {store.city}
-            </T>
-          </T>
-          <Icon xml={ICON.chevronDown} size={12} color={C.white} sw={2.2} />
-        </View>
+        <DeliverTo />
       </View>
 
       {/* header: logo + actions, then search */}

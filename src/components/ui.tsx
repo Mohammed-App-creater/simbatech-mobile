@@ -2,7 +2,7 @@
  * Small building blocks every screen uses: text in the brand fonts, icons, pressables, buttons,
  * form fields and loading / error states. Sizes and colours default to the website's.
  */
-import React, { useMemo, useState } from "react";
+import React, { useState } from "react";
 import {
   ActivityIndicator,
   Pressable,
@@ -452,27 +452,35 @@ export function LoadError({ message, onRetry, style }: { message?: string | null
   );
 }
 
-/** Runs an async loader when the deps change. `reload()` runs it again (pull to refresh, retry). */
+const sameDeps = (a: React.DependencyList, b: React.DependencyList) => a.length === b.length && a.every((v, i) => Object.is(v, b[i]));
+
+/**
+ * Runs an async loader when the deps change. `reload()` runs it again (pull to refresh, retry) and
+ * keeps showing the current data meanwhile; a change of deps starts from an empty state.
+ */
 export function useLoad<T>(load: () => Promise<T>, deps: React.DependencyList) {
-  const [state, setState] = useState<{ data: T | undefined; error: string | null; loading: boolean }>({ data: undefined, error: null, loading: true });
-  const [tick, setTick] = useState(0);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const key = useMemo(() => ({}), [...deps, tick]);
+  // `n` counts runs (dep changes + reloads), `gen` counts dep changes; results remember both
+  const [run, setRun] = useState({ deps, n: 0, gen: 0 });
+  if (!sameDeps(run.deps, deps)) setRun({ deps, n: run.n + 1, gen: run.gen + 1 });
+  const { n, gen } = run;
+  const [state, setState] = useState<{ n: number; gen: number; data: T | undefined; error: string | null }>({ n: -1, gen: -1, data: undefined, error: null });
   React.useEffect(() => {
     let live = true;
-    setState((s) => ({ ...s, loading: true, error: null }));
     load().then(
-      (data) => live && setState({ data, error: null, loading: false }),
-      (e) => live && setState((s) => ({ data: s.data, error: (e && e.message) || "Something went wrong. Please try again.", loading: false })),
+      (data) => live && setState({ n, gen, data, error: null }),
+      (e) => live && setState((s) => ({ n, gen, data: s.gen === gen ? s.data : undefined, error: (e && e.message) || "Something went wrong. Please try again." })),
     );
     return () => {
       live = false;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [key]);
+  }, [n]);
+  const loading = state.n !== n;
   return {
-    ...state,
-    reload: () => setTick((n) => n + 1),
-    setData: (data: T) => setState({ data, error: null, loading: false }),
+    data: state.gen === gen ? state.data : undefined,
+    error: loading ? null : state.error,
+    loading,
+    reload: () => setRun((r) => ({ ...r, n: r.n + 1 })),
+    setData: (data: T) => setState({ n, gen, data, error: null }),
   };
 }

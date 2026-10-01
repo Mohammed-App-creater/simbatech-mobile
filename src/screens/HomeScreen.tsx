@@ -411,19 +411,12 @@ export function SectionHead({ eyebrow, eyebrowColor = C.navy, title, link }: { e
 
 function Hero({ products, heroBundle }: { products: ProductDTO[]; heroBundle?: BundleDTO }) {
   const [idx, setIdx] = useState(0);
-  const lastChange = useRef(Date.now());
-  const now = useNow(1000);
-  // advance every 6 seconds, like the site
+  // advance every 6 seconds, like the site; picking a slide by hand restarts the wait
   useEffect(() => {
-    if (now - lastChange.current >= 6000) {
-      lastChange.current = now;
-      setIdx((i) => (i + 1) % SLIDES.length);
-    }
-  }, [now]);
-  const goTo = (i: number) => {
-    lastChange.current = Date.now();
-    setIdx((i + SLIDES.length) % SLIDES.length);
-  };
+    const t = setTimeout(() => setIdx((i) => (i + 1) % SLIDES.length), 6000);
+    return () => clearTimeout(t);
+  }, [idx]);
+  const goTo = (i: number) => setIdx((i + SLIDES.length) % SLIDES.length);
 
   const base = SLIDES[idx];
   const chipP = byKind(products, base.chipKind);

@@ -17,6 +17,7 @@ import { BricolageGrotesque_500Medium, BricolageGrotesque_600SemiBold, Bricolage
 import { InstrumentSerif_400Regular, InstrumentSerif_400Regular_Italic } from "@expo-google-fonts/instrument-serif";
 import { C } from "@/theme";
 import { bootstrap, setCurrentPath, useShop } from "@/lib/store";
+import { loadDeliverArea } from "@/lib/deliver-area";
 import { TabBar } from "@/components/TabBar";
 import { CategoryMenu } from "@/components/CategoryMenu";
 import { T, Tap } from "@/components/ui";
@@ -41,6 +42,7 @@ export default function RootLayout() {
 
   useEffect(() => {
     bootstrap();
+    loadDeliverArea();
   }, []);
   useEffect(() => {
     setCurrentPath(pathname);
